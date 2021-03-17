@@ -4,15 +4,17 @@ import OSM from 'ol/source/OSM';
 import sVector from 'ol/source/Vector';
 import lVector from 'ol/layer/Vector';
 import {FullScreen, defaults as defaultControls} from 'ol/control';
-import { fromLonLat } from 'ol/proj';
+import { fromLonLat, toLonLat } from 'ol/proj';
 import {Tile as TileLayer, Vector as VectorLayer} from 'ol/layer';
 import {Icon, Style} from 'ol/style';
 import features from './features'
+import { htmlPrefilter } from 'jquery';
+import { visitFunctionBody } from 'typescript';
 
 
 var iconStyle = new Style({
-  image: new Icon( /** @type {olx.style.IconOptions} */ ({
-    anchor: [0.5, 18],
+  image: new Icon(({
+    anchor: [0.5, 18], 
     anchorXUnits: 'fraction',
     anchorYUnits: 'pixels',
     src: 'https://www.dropbox.com/s/fx852dq393bwjj3/icon.png?dl=1'
@@ -56,9 +58,26 @@ map.on('click', function(evt) {
         var geometry = f.getGeometry();
         var coord = geometry.getCoordinates();
         
-        (document.getElementById('img01') as HTMLImageElement).style.visibility = "visible"
- 
+        (document.getElementById('img') as HTMLImageElement).src = f.get('images')[0];
+        (document.getElementById('img') as HTMLImageElement).style.visibility = "visible"
+        
+       
     } 
+});
+
+map.on('contextmenu', function(evt){
+  var coords = toLonLat(evt.coordinate);
+  var lat = coords[1];
+  var lon = coords[0];
+  var locTxt = String(lat) + " " + String(lon);
+  alert(locTxt)
+});
+
+$(document).keydown(function(e) {
+  if (e.key === "Escape") { 
+    img.style.visibility = "hidden";
+    img.src = ""
+  }
 });
 
 map.on('pointermove', function(e){
@@ -68,4 +87,18 @@ map.on('pointermove', function(e){
 });
 
 document.getElementById('map').focus();
-(document.getElementById('img01') as HTMLImageElement).src = "assets/img/moon.png";
+const img = (document.getElementById('img') as HTMLImageElement);
+
+function CenterImage(){
+  img.style.height = String($(window).height()*(9/10))+"px";
+  img.style.width = String((img.naturalWidth*img.height)/img.naturalHeight)+"px"
+
+  img.style.marginLeft = String(-(img.width/2))+"px";
+  img.style.marginTop = String(-(img.height/2))+"px";
+}
+
+img.onload = CenterImage;
+window.onresize = CenterImage;
+CenterImage();
+img.style.top = "50%";
+img.style.left = "50%";

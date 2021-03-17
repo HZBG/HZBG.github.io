@@ -5,23 +5,29 @@ import * as ol from 'ol';
 var icons = [
   new ol.Feature({
     geometry: new Point(fromLonLat([15.69526, 48.28461])),
-    addr: 'Dsdd',
     type: 'click',
-    text: 0
+    text: "0",
+    images: [
+      "assets/img/moon.png"
+    ]
   }),
   
   new ol.Feature({
     geometry: new Point(fromLonLat([15.69476, 48.28529])),
-    addr: 'sdgfg',
     type: 'click',
-    text: 1
+    text: "1",
+    images: [
+      "assets/Auring/DSC_1455.JPG"
+    ]
   }),
 
   new ol.Feature({
-    geometry: new Point(fromLonLat([15.69476, 48.28529])),
-    addr: 'sdgfg',
+    geometry: new Point(fromLonLat([15.69476, 48.28729])),
     type: 'click',
-    text: 1
+    text: "2",
+    images: [
+      "assets/Auring/20191122_090245.jpg"
+    ]
   })
 ]
 

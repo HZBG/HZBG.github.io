@@ -3738,6 +3738,23 @@
         return transform(coordinate, 'EPSG:4326', opt_projection !== undefined ? opt_projection : 'EPSG:3857');
     }
     /**
+     * Transforms a coordinate to longitude/latitude.
+     * @param {import("./coordinate.js").Coordinate} coordinate Projected coordinate.
+     * @param {ProjectionLike=} opt_projection Projection of the coordinate.
+     *     The default is Web Mercator, i.e. 'EPSG:3857'.
+     * @return {import("./coordinate.js").Coordinate} Coordinate as longitude and latitude, i.e. an array
+     *     with longitude as 1st and latitude as 2nd element.
+     * @api
+     */
+    function toLonLat(coordinate, opt_projection) {
+        var lonLat = transform(coordinate, opt_projection !== undefined ? opt_projection : 'EPSG:3857', 'EPSG:4326');
+        var lon = lonLat[0];
+        if (lon < -180 || lon > 180) {
+            lonLat[0] = modulo(lon + 180, 360) - 180;
+        }
+        return lonLat;
+    }
+    /**
      * Checks if two projections are the same, that is every coordinate in one
      * projection does represent the same geographic point as the same coordinate in
      * the other projection.
@@ -31081,21 +31098,27 @@
     var icons = [
         new Feature({
             geometry: new Point(fromLonLat([15.69526, 48.28461])),
-            addr: 'Dsdd',
             type: 'click',
-            text: 0
+            text: "0",
+            images: [
+                "assets/img/moon.png"
+            ]
         }),
         new Feature({
             geometry: new Point(fromLonLat([15.69476, 48.28529])),
-            addr: 'sdgfg',
             type: 'click',
-            text: 1
+            text: "1",
+            images: [
+                "assets/Auring/DSC_1455.JPG"
+            ]
         }),
         new Feature({
-            geometry: new Point(fromLonLat([15.69476, 48.28529])),
-            addr: 'sdgfg',
+            geometry: new Point(fromLonLat([15.69476, 48.28729])),
             type: 'click',
-            text: 1
+            text: "2",
+            images: [
+                "assets/Auring/20191122_090245.jpg"
+            ]
         })
     ];
     var features = {
@@ -31103,7 +31126,7 @@
     };
 
     var iconStyle = new Style({
-        image: new Icon(/** @type {olx.style.IconOptions} */ ({
+        image: new Icon(({
             anchor: [0.5, 18],
             anchorXUnits: 'fraction',
             anchorYUnits: 'pixels',
@@ -31139,7 +31162,21 @@
         if (f && f.get('type') == 'click') {
             var geometry = f.getGeometry();
             geometry.getCoordinates();
-            document.getElementById('img01').style.visibility = "visible";
+            document.getElementById('img').src = f.get('images')[0];
+            document.getElementById('img').style.visibility = "visible";
+        }
+    });
+    map.on('contextmenu', function (evt) {
+        var coords = toLonLat(evt.coordinate);
+        var lat = coords[1];
+        var lon = coords[0];
+        var locTxt = String(lat) + " " + String(lon);
+        alert(locTxt);
+    });
+    $(document).keydown(function (e) {
+        if (e.key === "Escape") {
+            img.style.visibility = "hidden";
+            img.src = "";
         }
     });
     map.on('pointermove', function (e) {
@@ -31148,6 +31185,17 @@
         map.getViewport().style.cursor = hit ? 'pointer' : '';
     });
     document.getElementById('map').focus();
-    document.getElementById('img01').src = "assets/img/moon.png";
+    var img = document.getElementById('img');
+    function CenterImage() {
+        img.style.height = String($(window).height() * (9 / 10)) + "px";
+        img.style.width = String((img.naturalWidth * img.height) / img.naturalHeight) + "px";
+        img.style.marginLeft = String(-(img.width / 2)) + "px";
+        img.style.marginTop = String(-(img.height / 2)) + "px";
+    }
+    img.onload = CenterImage;
+    window.onresize = CenterImage;
+    CenterImage();
+    img.style.top = "50%";
+    img.style.left = "50%";
 
 }());
