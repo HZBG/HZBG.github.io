@@ -8,9 +8,9 @@ import { fromLonLat, toLonLat } from 'ol/proj';
 import {Tile as TileLayer, Vector as VectorLayer} from 'ol/layer';
 import {Icon, Style} from 'ol/style';
 import features from './features'
-import { htmlPrefilter } from 'jquery';
-import { visitFunctionBody } from 'typescript';
-
+import {defaults as defaultInteractions} from 'ol/interaction';
+import KeyboardZoom from 'ol/interaction/KeyboardZoom';
+import Collection from 'ol/Collection';
 
 var iconStyle = new Style({
   image: new Icon(({
@@ -47,7 +47,10 @@ var map = new ol.Map({
     zoom: 15,
     maxZoom: 18,
   }),
+  interactions: defaultInteractions({keyboard: false}).extend([new KeyboardZoom()]),
 });
+
+var imgs; var index;
 
 map.on('click', function(evt) {
     var f = map.forEachFeatureAtPixel(
@@ -58,10 +61,9 @@ map.on('click', function(evt) {
         var geometry = f.getGeometry();
         var coord = geometry.getCoordinates();
         
-        (document.getElementById('img') as HTMLImageElement).src = f.get('images')[0];
-        (document.getElementById('img') as HTMLImageElement).style.visibility = "visible"
-        
-       
+        imgs = f.get('images'); index = 0;
+        (document.getElementById('img') as HTMLImageElement).src = imgs[0];
+        (document.getElementById('img') as HTMLImageElement).style.visibility = "visible";
     } 
 });
 
@@ -76,7 +78,22 @@ map.on('contextmenu', function(evt){
 $(document).keydown(function(e) {
   if (e.key === "Escape") { 
     img.style.visibility = "hidden";
-    img.src = ""
+    img.removeAttribute('src');
+    document.getElementById('map').focus();
+  }
+
+  if (e.key === "ArrowRight") { 
+    if (typeof imgs[index + 1] !== "undefined"){
+      index += 1;
+      (document.getElementById('img') as HTMLImageElement).src = imgs[index];
+    }
+  }
+
+  if (e.key === "ArrowLeft") { 
+    if (typeof imgs[index - 1] !== "undefined"){
+      index -= 1;
+      (document.getElementById('img') as HTMLImageElement).src = imgs[index];
+    }
   }
 });
 
@@ -100,5 +117,6 @@ function CenterImage(){
 img.onload = CenterImage;
 window.onresize = CenterImage;
 CenterImage();
+img.style.position = "absolute"
 img.style.top = "50%";
 img.style.left = "50%";

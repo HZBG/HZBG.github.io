@@ -11,12 +11,12 @@ html, body {
 }
 
 #img {
-  z-index: 1000;
   position: absolute;
   top: 0;
   left: 0;
   width: 1000px;
   height: 750px;
+  z-index: 1000;
   visibility: hidden;
 }
 

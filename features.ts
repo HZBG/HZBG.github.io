@@ -17,7 +17,8 @@ var icons = [
     type: 'click',
     text: "1",
     images: [
-      "assets/Auring/DSC_1455.JPG"
+      "assets/Auring/DSC_1455.JPG",
+      "assets/Auring/20191122_085427.jpg"
     ]
   }),
 
@@ -26,7 +27,9 @@ var icons = [
     type: 'click',
     text: "2",
     images: [
-      "assets/Auring/20191122_090245.jpg"
+      "assets/Auring/20191122_090245.jpg",
+      "assets/Auring/20190825_113825.jpg",
+      "assets/Auring/DSC_1453.JPG"
     ]
   })
 ]

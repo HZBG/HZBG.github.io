@@ -26159,7 +26159,7 @@
     })();
     /**
      * @typedef {Object} Options
-     * @property {import("../events/condition.js").Condition} [condition] A function that
+     * @property {import("ol/events/condition").Condition} [condition] A function that
      * takes an {@link module:ol/MapBrowserEvent~MapBrowserEvent} and returns a
      * boolean to indicate whether that event should be handled. Default is
      * {@link module:ol/events/condition~noModifierKeys} and
@@ -26191,7 +26191,7 @@
             var options = opt_options || {};
             /**
              * @private
-             * @param {import("../MapBrowserEvent.js").default} mapBrowserEvent Browser event.
+             * @param {import("ol/MapBrowserEvent").default} mapBrowserEvent Browser event.
              * @return {boolean} Combined condition result.
              */
             _this.defaultCondition_ = function (mapBrowserEvent) {
@@ -26199,7 +26199,7 @@
             };
             /**
              * @private
-             * @type {import("../events/condition.js").Condition}
+             * @type {import("ol/events/condition").Condition}
              */
             _this.condition_ =
                 options.condition !== undefined
@@ -26222,7 +26222,7 @@
          * Handles the {@link module:ol/MapBrowserEvent map browser event} if it was a
          * `KeyEvent`, and decides the direction to pan to (if an arrow key was
          * pressed).
-         * @param {import("../MapBrowserEvent.js").default} mapBrowserEvent Map browser event.
+         * @param {import("ol/MapBrowserEvent").default} mapBrowserEvent Map browser event.
          * @return {boolean} `false` to stop event propagation.
          * @this {KeyboardPan}
          */
@@ -31109,7 +31109,8 @@
             type: 'click',
             text: "1",
             images: [
-                "assets/Auring/DSC_1455.JPG"
+                "assets/Auring/DSC_1455.JPG",
+                "assets/Auring/20191122_085427.jpg"
             ]
         }),
         new Feature({
@@ -31117,7 +31118,9 @@
             type: 'click',
             text: "2",
             images: [
-                "assets/Auring/20191122_090245.jpg"
+                "assets/Auring/20191122_090245.jpg",
+                "assets/Auring/20190825_113825.jpg",
+                "assets/Auring/DSC_1453.JPG"
             ]
         })
     ];
@@ -31156,13 +31159,18 @@
             zoom: 15,
             maxZoom: 18,
         }),
+        interactions: defaults({ keyboard: false }).extend([new KeyboardZoom()]),
     });
+    var imgs;
+    var index;
     map.on('click', function (evt) {
         var f = map.forEachFeatureAtPixel(evt.pixel, function (ft, layer) { return ft; });
         if (f && f.get('type') == 'click') {
             var geometry = f.getGeometry();
             geometry.getCoordinates();
-            document.getElementById('img').src = f.get('images')[0];
+            imgs = f.get('images');
+            index = 0;
+            document.getElementById('img').src = imgs[0];
             document.getElementById('img').style.visibility = "visible";
         }
     });
@@ -31176,7 +31184,20 @@
     $(document).keydown(function (e) {
         if (e.key === "Escape") {
             img.style.visibility = "hidden";
-            img.src = "";
+            img.removeAttribute('src');
+            document.getElementById('map').focus();
+        }
+        if (e.key === "ArrowRight") {
+            if (typeof imgs[index + 1] !== "undefined") {
+                index += 1;
+                document.getElementById('img').src = imgs[index];
+            }
+        }
+        if (e.key === "ArrowLeft") {
+            if (typeof imgs[index - 1] !== "undefined") {
+                index -= 1;
+                document.getElementById('img').src = imgs[index];
+            }
         }
     });
     map.on('pointermove', function (e) {
@@ -31195,6 +31216,7 @@
     img.onload = CenterImage;
     window.onresize = CenterImage;
     CenterImage();
+    img.style.position = "absolute";
     img.style.top = "50%";
     img.style.left = "50%";
 
