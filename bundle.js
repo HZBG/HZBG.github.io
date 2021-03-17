@@ -26159,7 +26159,7 @@
     })();
     /**
      * @typedef {Object} Options
-     * @property {import("ol/events/condition").Condition} [condition] A function that
+     * @property {import("../events/condition.js").Condition} [condition] A function that
      * takes an {@link module:ol/MapBrowserEvent~MapBrowserEvent} and returns a
      * boolean to indicate whether that event should be handled. Default is
      * {@link module:ol/events/condition~noModifierKeys} and
@@ -26191,7 +26191,7 @@
             var options = opt_options || {};
             /**
              * @private
-             * @param {import("ol/MapBrowserEvent").default} mapBrowserEvent Browser event.
+             * @param {import("../MapBrowserEvent.js").default} mapBrowserEvent Browser event.
              * @return {boolean} Combined condition result.
              */
             _this.defaultCondition_ = function (mapBrowserEvent) {
@@ -26199,7 +26199,7 @@
             };
             /**
              * @private
-             * @type {import("ol/events/condition").Condition}
+             * @type {import("../events/condition.js").Condition}
              */
             _this.condition_ =
                 options.condition !== undefined
@@ -26222,7 +26222,7 @@
          * Handles the {@link module:ol/MapBrowserEvent map browser event} if it was a
          * `KeyEvent`, and decides the direction to pan to (if an arrow key was
          * pressed).
-         * @param {import("ol/MapBrowserEvent").default} mapBrowserEvent Map browser event.
+         * @param {import("../MapBrowserEvent.js").default} mapBrowserEvent Map browser event.
          * @return {boolean} `false` to stop event propagation.
          * @this {KeyboardPan}
          */
@@ -31161,6 +31161,18 @@
         }),
         interactions: defaults({ keyboard: false }).extend([new KeyboardZoom()]),
     });
+    var btn = document.getElementById("close_btn");
+    btn.addEventListener("click", function (e) { return hideimg(); });
+    function showimg() {
+        document.getElementById('img').style.visibility = "visible";
+        document.getElementById('black').style.visibility = "visible";
+        document.getElementById('close_btn').style.visibility = "visible";
+    }
+    function hideimg() {
+        document.getElementById('img').style.visibility = "hidden";
+        document.getElementById('black').style.visibility = "hidden";
+        document.getElementById('close_btn').style.visibility = "hidden";
+    }
     var imgs;
     var index;
     map.on('click', function (evt) {
@@ -31171,7 +31183,7 @@
             imgs = f.get('images');
             index = 0;
             document.getElementById('img').src = imgs[0];
-            document.getElementById('img').style.visibility = "visible";
+            showimg();
         }
     });
     map.on('contextmenu', function (evt) {
@@ -31186,6 +31198,7 @@
             img.style.visibility = "hidden";
             img.removeAttribute('src');
             document.getElementById('map').focus();
+            hideimg();
         }
         if (e.key === "ArrowRight") {
             if (typeof imgs[index + 1] !== "undefined") {
@@ -31207,11 +31220,12 @@
     });
     document.getElementById('map').focus();
     var img = document.getElementById('img');
+    document.getElementById('black');
     function CenterImage() {
-        img.style.height = String($(window).height() * (9 / 10)) + "px";
+        img.style.height = String($(window).height() * (92 / 100)) + "px";
         img.style.width = String((img.naturalWidth * img.height) / img.naturalHeight) + "px";
         img.style.marginLeft = String(-(img.width / 2)) + "px";
-        img.style.marginTop = String(-(img.height / 2)) + "px";
+        img.style.marginTop = String(-(img.height / 2) + $(window).height() * (4 / 100) - 3) + "px";
     }
     img.onload = CenterImage;
     window.onresize = CenterImage;

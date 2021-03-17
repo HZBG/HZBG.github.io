@@ -50,6 +50,21 @@ var map = new ol.Map({
   interactions: defaultInteractions({keyboard: false}).extend([new KeyboardZoom()]),
 });
 
+let btn = document.getElementById("close_btn");
+btn.addEventListener("click", (e:Event) => hideimg());
+
+function showimg(){
+  (document.getElementById('img') as HTMLImageElement).style.visibility = "visible";
+  (document.getElementById('black') as HTMLImageElement).style.visibility = "visible";
+  document.getElementById('close_btn').style.visibility = "visible";
+}
+
+function hideimg(){
+  (document.getElementById('img') as HTMLImageElement).style.visibility = "hidden";
+  (document.getElementById('black') as HTMLImageElement).style.visibility = "hidden";
+  document.getElementById('close_btn').style.visibility = "hidden";
+}
+
 var imgs; var index;
 
 map.on('click', function(evt) {
@@ -63,7 +78,7 @@ map.on('click', function(evt) {
         
         imgs = f.get('images'); index = 0;
         (document.getElementById('img') as HTMLImageElement).src = imgs[0];
-        (document.getElementById('img') as HTMLImageElement).style.visibility = "visible";
+        showimg();
     } 
 });
 
@@ -80,6 +95,7 @@ $(document).keydown(function(e) {
     img.style.visibility = "hidden";
     img.removeAttribute('src');
     document.getElementById('map').focus();
+    hideimg();
   }
 
   if (e.key === "ArrowRight") { 
@@ -105,13 +121,14 @@ map.on('pointermove', function(e){
 
 document.getElementById('map').focus();
 const img = (document.getElementById('img') as HTMLImageElement);
+const black = (document.getElementById('black') as HTMLImageElement);
 
 function CenterImage(){
-  img.style.height = String($(window).height()*(9/10))+"px";
+  img.style.height = String($(window).height()*(92/100))+"px";
   img.style.width = String((img.naturalWidth*img.height)/img.naturalHeight)+"px"
 
   img.style.marginLeft = String(-(img.width/2))+"px";
-  img.style.marginTop = String(-(img.height/2))+"px";
+  img.style.marginTop = String(-(img.height/2)+$(window).height()*(4/100)-3)+"px";
 }
 
 img.onload = CenterImage;
