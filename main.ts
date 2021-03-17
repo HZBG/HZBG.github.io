@@ -63,6 +63,7 @@ function hideimg(){
   (document.getElementById('img') as HTMLImageElement).style.visibility = "hidden";
   (document.getElementById('black') as HTMLImageElement).style.visibility = "hidden";
   document.getElementById('close_btn').style.visibility = "hidden";
+  (document.getElementById('img') as HTMLImageElement).src = "";
 }
 
 var imgs; var index;
@@ -128,7 +129,7 @@ function CenterImage(){
   img.style.width = String((img.naturalWidth*img.height)/img.naturalHeight)+"px"
 
   img.style.marginLeft = String(-(img.width/2))+"px";
-  img.style.marginTop = String(-(img.height/2)+$(window).height()*(4/100)-3)+"px";
+  img.style.marginTop = String(-(img.height/2)+$(window).height()*(4/100)-5)+"px";
 }
 
 img.onload = CenterImage;
