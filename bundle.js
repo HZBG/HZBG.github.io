@@ -31172,6 +31172,7 @@
         document.getElementById('img').style.visibility = "hidden";
         document.getElementById('black').style.visibility = "hidden";
         document.getElementById('close_btn').style.visibility = "hidden";
+        document.getElementById('img').src = "";
     }
     var imgs;
     var index;
@@ -31225,7 +31226,7 @@
         img.style.height = String($(window).height() * (92 / 100)) + "px";
         img.style.width = String((img.naturalWidth * img.height) / img.naturalHeight) + "px";
         img.style.marginLeft = String(-(img.width / 2)) + "px";
-        img.style.marginTop = String(-(img.height / 2) + $(window).height() * (4 / 100) - 3) + "px";
+        img.style.marginTop = String(-(img.height / 2) + $(window).height() * (4 / 100) - 5) + "px";
     }
     img.onload = CenterImage;
     window.onresize = CenterImage;
