@@ -31194,7 +31194,7 @@
         var locTxt = String(lat) + " " + String(lon);
         alert(locTxt);
     });
-    $(document).keydown(function (e) {
+    $(document).on('keydown', function (e) {
         if (e.key === "Escape") {
             img.style.visibility = "hidden";
             img.removeAttribute('src');
@@ -31212,6 +31212,9 @@
                 index -= 1;
                 document.getElementById('img').src = imgs[index];
             }
+        }
+        if (e.key === "e") {
+            window.location.replace("http://hzbg.github.io/editor");
         }
     });
     map.on('pointermove', function (e) {

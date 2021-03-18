@@ -91,7 +91,7 @@ map.on('contextmenu', function(evt){
   alert(locTxt)
 });
 
-$(document).keydown(function(e) {
+$(document).on('keydown', function(e) {
   if (e.key === "Escape") { 
     img.style.visibility = "hidden";
     img.removeAttribute('src');
@@ -111,6 +111,11 @@ $(document).keydown(function(e) {
       index -= 1;
       (document.getElementById('img') as HTMLImageElement).src = imgs[index];
     }
+  }
+
+  if (e.key === "e") { 
+    window.location.replace("http://hzbg.github.io/editor");
+    
   }
 });
 
