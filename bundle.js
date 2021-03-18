@@ -3738,23 +3738,6 @@
         return transform(coordinate, 'EPSG:4326', opt_projection !== undefined ? opt_projection : 'EPSG:3857');
     }
     /**
-     * Transforms a coordinate to longitude/latitude.
-     * @param {import("./coordinate.js").Coordinate} coordinate Projected coordinate.
-     * @param {ProjectionLike=} opt_projection Projection of the coordinate.
-     *     The default is Web Mercator, i.e. 'EPSG:3857'.
-     * @return {import("./coordinate.js").Coordinate} Coordinate as longitude and latitude, i.e. an array
-     *     with longitude as 1st and latitude as 2nd element.
-     * @api
-     */
-    function toLonLat(coordinate, opt_projection) {
-        var lonLat = transform(coordinate, opt_projection !== undefined ? opt_projection : 'EPSG:3857', 'EPSG:4326');
-        var lon = lonLat[0];
-        if (lon < -180 || lon > 180) {
-            lonLat[0] = modulo(lon + 180, 360) - 180;
-        }
-        return lonLat;
-    }
-    /**
      * Checks if two projections are the same, that is every coordinate in one
      * projection does represent the same geographic point as the same coordinate in
      * the other projection.
@@ -31099,7 +31082,7 @@
         new Feature({
             geometry: new Point(fromLonLat([15.69526, 48.28461])),
             type: 'click',
-            text: "0",
+            text: "1888888888888",
             images: [
                 "assets/img/moon.png"
             ]
@@ -31107,7 +31090,7 @@
         new Feature({
             geometry: new Point(fromLonLat([15.69476, 48.28529])),
             type: 'click',
-            text: "1",
+            text: "288888888888",
             images: [
                 "assets/Auring/DSC_1455.JPG",
                 "assets/Auring/20191122_085427.jpg"
@@ -31116,7 +31099,7 @@
         new Feature({
             geometry: new Point(fromLonLat([15.69476, 48.28729])),
             type: 'click',
-            text: "2",
+            text: "38888888888",
             images: [
                 "assets/Auring/20191122_090245.jpg",
                 "assets/Auring/20190825_113825.jpg",
@@ -31128,6 +31111,7 @@
         icons: icons
     };
 
+    /* Import features from ./features.ts */
     var iconStyle = new Style({
         image: new Icon(({
             anchor: [0.5, 18],
@@ -31145,6 +31129,7 @@
     var vectorLayer = new VectorLayer({
         source: vectorSource
     });
+    /* Initialize map */
     var map = new Map({
         /*controls: defaultControls().extend([new FullScreen()]),*/
         layers: [
@@ -31161,21 +31146,44 @@
         }),
         interactions: defaults({ keyboard: false }).extend([new KeyboardZoom()]),
     });
-    var btn = document.getElementById("close_btn");
-    btn.addEventListener("click", function (e) { return hideimg(); });
+    /* Change image in browser */
+    function left() {
+        if (typeof imgs[index - 1] !== "undefined") {
+            index -= 1;
+            document.getElementById('img').src = imgs[index];
+        }
+    }
+    function right() {
+        if (typeof imgs[index + 1] !== "undefined") {
+            index += 1;
+            document.getElementById('img').src = imgs[index];
+        }
+    }
+    /* Listener */
+    var close_btn = document.getElementById("close_btn");
+    close_btn.addEventListener("click", function (e) { return hideimg(); });
+    var left_btn = document.getElementById("left_btn");
+    left_btn.addEventListener("click", function (e) { return left(); });
+    var right_btn = document.getElementById("right_btn");
+    right_btn.addEventListener("click", function (e) { return right(); });
+    /* Show and hide picture browser */
+    var imgelem = ["img", "black", "close_btn", "right_btn", "left_btn", "txt"];
     function showimg() {
-        document.getElementById('img').style.visibility = "visible";
-        document.getElementById('black').style.visibility = "visible";
-        document.getElementById('close_btn').style.visibility = "visible";
+        imgelem.forEach(function (element) {
+            document.getElementById(element).style.visibility = "visible";
+        });
     }
     function hideimg() {
-        document.getElementById('img').style.visibility = "hidden";
-        document.getElementById('black').style.visibility = "hidden";
-        document.getElementById('close_btn').style.visibility = "hidden";
+        imgelem.forEach(function (element) {
+            document.getElementById(element).style.visibility = "hidden";
+        });
         document.getElementById('img').src = "";
     }
+    /* Click On Icons */
     var imgs;
     var index;
+    var hedrtext;
+    var ctn = 0;
     map.on('click', function (evt) {
         var f = map.forEachFeatureAtPixel(evt.pixel, function (ft, layer) { return ft; });
         if (f && f.get('type') == 'click') {
@@ -31183,17 +31191,25 @@
             geometry.getCoordinates();
             imgs = f.get('images');
             index = 0;
+            hedrtext = f.get('text');
+            document.getElementById('txt').innerHTML = hedrtext;
             document.getElementById('img').src = imgs[0];
+            ctn = 0;
+            while (typeof imgs[ctn] !== "undefined") {
+                ctn += 1;
+            }
             showimg();
         }
     });
-    map.on('contextmenu', function (evt) {
-        var coords = toLonLat(evt.coordinate);
-        var lat = coords[1];
-        var lon = coords[0];
-        var locTxt = String(lat) + " " + String(lon);
-        alert(locTxt);
-    });
+    /* Display Coordinates on right click
+    map.on('contextmenu', function(evt){
+      var coords = toLonLat(evt.coordinate);
+      var lat = coords[1];
+      var lon = coords[0];
+      var locTxt = String(lat) + " " + String(lon);
+      alert(locTxt)
+    }); */
+    /* Keydown */
     $(document).on('keydown', function (e) {
         if (e.key === "Escape") {
             img.style.visibility = "hidden";
@@ -31202,37 +31218,71 @@
             hideimg();
         }
         if (e.key === "ArrowRight") {
-            if (typeof imgs[index + 1] !== "undefined") {
-                index += 1;
-                document.getElementById('img').src = imgs[index];
-            }
+            right();
         }
         if (e.key === "ArrowLeft") {
-            if (typeof imgs[index - 1] !== "undefined") {
-                index -= 1;
-                document.getElementById('img').src = imgs[index];
-            }
+            left();
         }
         if (e.key === "e") {
             window.location.replace("http://hzbg.github.io/editor");
         }
     });
+    /* Show other cursor when hovering over features */
     map.on('pointermove', function (e) {
         var pixel = map.getEventPixel(e.originalEvent);
         var hit = map.hasFeatureAtPixel(pixel);
         map.getViewport().style.cursor = hit ? 'pointer' : '';
     });
-    document.getElementById('map').focus();
     var img = document.getElementById('img');
     document.getElementById('black');
+    function OnLoad() {
+        UpdateBtn();
+        CenterImage();
+    }
+    function OnResize() {
+        CenterImage();
+        UpdateBtn();
+    }
+    function UpdateBtn() {
+        var btn_l = document.getElementById('left_btn');
+        var btn_r = document.getElementById('right_btn');
+        document.getElementById('left_btn').style.top = String($(window).height() / 2 - btn_l.height / 2) + "px";
+        document.getElementById('right_btn').style.top = String($(window).height() / 2 - btn_r.height / 2) + "px";
+        document.getElementById('txt').style.fontSize = String($(window).height() * (6 / 100)) + "px";
+    }
     function CenterImage() {
         img.style.height = String($(window).height() * (92 / 100)) + "px";
         img.style.width = String((img.naturalWidth * img.height) / img.naturalHeight) + "px";
         img.style.marginLeft = String(-(img.width / 2)) + "px";
         img.style.marginTop = String(-(img.height / 2) + $(window).height() * (4 / 100) - 5) + "px";
+        try {
+            if (typeof imgs[index + 1] == "undefined") {
+                document.getElementById('right_btn').style.visibility = "hidden";
+            }
+            else {
+                document.getElementById('right_btn').style.visibility = "visible";
+            }
+        }
+        catch (_a) { }
+        try {
+            if (typeof imgs[index - 1] == "undefined") {
+                document.getElementById('left_btn').style.visibility = "hidden";
+            }
+            else {
+                document.getElementById('left_btn').style.visibility = "visible";
+            }
+        }
+        catch (_b) { }
+        if (ctn > 1) {
+            document.getElementById('txt').innerHTML = ("(" + String(index + 1) + "/" + String(ctn) + ") " + hedrtext);
+        }
+        else {
+            document.getElementById('txt').innerHTML = hedrtext;
+        }
     }
     img.onload = CenterImage;
-    window.onresize = CenterImage;
+    window.onresize = OnResize;
+    window.onload = OnLoad;
     CenterImage();
     img.style.position = "absolute";
     img.style.top = "50%";

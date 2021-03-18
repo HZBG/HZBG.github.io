@@ -12,6 +12,7 @@ import {defaults as defaultInteractions} from 'ol/interaction';
 import KeyboardZoom from 'ol/interaction/KeyboardZoom';
 import Collection from 'ol/Collection';
 
+/* Import features from ./features.ts */
 var iconStyle = new Style({
   image: new Icon(({
     anchor: [0.5, 18], 
@@ -33,6 +34,7 @@ var vectorLayer = new lVector({
   source: vectorSource
 });
 
+/* Initialize map */
 var map = new ol.Map({
   /*controls: defaultControls().extend([new FullScreen()]),*/
   layers: [
@@ -50,24 +52,54 @@ var map = new ol.Map({
   interactions: defaultInteractions({keyboard: false}).extend([new KeyboardZoom()]),
 });
 
-let btn = document.getElementById("close_btn");
-btn.addEventListener("click", (e:Event) => hideimg());
+
+/* Change image in browser */
+function left(){
+  if (typeof imgs[index - 1] !== "undefined"){
+    index -= 1;
+    (document.getElementById('img') as HTMLImageElement).src = imgs[index];
+  } 
+}
+
+function right(){
+  if (typeof imgs[index + 1] !== "undefined"){
+    index += 1;
+    (document.getElementById('img') as HTMLImageElement).src = imgs[index];
+  }
+}
+
+
+
+/* Listener */
+var close_btn = document.getElementById("close_btn");
+close_btn.addEventListener("click", (e:Event) => hideimg());
+
+var left_btn = document.getElementById("left_btn");
+left_btn.addEventListener("click", (e:Event) => left());
+
+var right_btn = document.getElementById("right_btn");
+right_btn.addEventListener("click", (e:Event) => right());
+
+
+/* Show and hide picture browser */
+var imgelem = ["img", "black", "close_btn", "right_btn", "left_btn", "txt"]
 
 function showimg(){
-  (document.getElementById('img') as HTMLImageElement).style.visibility = "visible";
-  (document.getElementById('black') as HTMLImageElement).style.visibility = "visible";
-  document.getElementById('close_btn').style.visibility = "visible";
+  imgelem.forEach(element => {
+    document.getElementById(element).style.visibility = "visible";
+  });
 }
 
 function hideimg(){
-  (document.getElementById('img') as HTMLImageElement).style.visibility = "hidden";
-  (document.getElementById('black') as HTMLImageElement).style.visibility = "hidden";
-  document.getElementById('close_btn').style.visibility = "hidden";
+  imgelem.forEach(element => {
+    document.getElementById(element).style.visibility = "hidden";
+  });
   (document.getElementById('img') as HTMLImageElement).src = "";
 }
 
-var imgs; var index;
 
+/* Click On Icons */
+var imgs; var index; var hedrtext; var ctn = 0;
 map.on('click', function(evt) {
     var f = map.forEachFeatureAtPixel(
         evt.pixel,
@@ -78,19 +110,29 @@ map.on('click', function(evt) {
         var coord = geometry.getCoordinates();
         
         imgs = f.get('images'); index = 0;
+        hedrtext = f.get('text');
+        document.getElementById('txt').innerHTML = hedrtext;
         (document.getElementById('img') as HTMLImageElement).src = imgs[0];
+
+        ctn = 0;
+        while (typeof imgs[ctn] !== "undefined"){
+          ctn += 1;
+        }
+
         showimg();
     } 
 });
 
+/* Display Coordinates on right click
 map.on('contextmenu', function(evt){
   var coords = toLonLat(evt.coordinate);
   var lat = coords[1];
   var lon = coords[0];
   var locTxt = String(lat) + " " + String(lon);
   alert(locTxt)
-});
+}); */
 
+/* Keydown */
 $(document).on('keydown', function(e) {
   if (e.key === "Escape") { 
     img.style.visibility = "hidden";
@@ -100,17 +142,11 @@ $(document).on('keydown', function(e) {
   }
 
   if (e.key === "ArrowRight") { 
-    if (typeof imgs[index + 1] !== "undefined"){
-      index += 1;
-      (document.getElementById('img') as HTMLImageElement).src = imgs[index];
-    }
+    right();
   }
 
   if (e.key === "ArrowLeft") { 
-    if (typeof imgs[index - 1] !== "undefined"){
-      index -= 1;
-      (document.getElementById('img') as HTMLImageElement).src = imgs[index];
-    }
+    left();
   }
 
   if (e.key === "e") { 
@@ -119,27 +155,71 @@ $(document).on('keydown', function(e) {
   }
 });
 
+/* Show other cursor when hovering over features */
 map.on('pointermove', function(e){
   var pixel = map.getEventPixel(e.originalEvent);
   var hit = map.hasFeatureAtPixel(pixel);
   map.getViewport().style.cursor = hit ? 'pointer' : '';
 });
 
-document.getElementById('map').focus();
 const img = (document.getElementById('img') as HTMLImageElement);
 const black = (document.getElementById('black') as HTMLImageElement);
 
+function OnLoad(){
+  UpdateBtn();
+  CenterImage();
+}
+
+function OnResize(){
+  CenterImage();
+  UpdateBtn();
+}
+
+function UpdateBtn() {
+  var btn_l = (document.getElementById('left_btn') as HTMLImageElement);
+  var btn_r = (document.getElementById('right_btn') as HTMLImageElement);
+  document.getElementById('left_btn').style.top = String($(window).height()/2-btn_l.height/2)+"px";
+  document.getElementById('right_btn').style.top = String($(window).height()/2-btn_r.height/2)+"px";
+
+  document.getElementById('txt').style.fontSize = String($(window).height()*(6/100))+"px";
+}
+
 function CenterImage(){
   img.style.height = String($(window).height()*(92/100))+"px";
-  img.style.width = String((img.naturalWidth*img.height)/img.naturalHeight)+"px"
+  img.style.width = String((img.naturalWidth*img.height)/img.naturalHeight)+"px";
 
   img.style.marginLeft = String(-(img.width/2))+"px";
   img.style.marginTop = String(-(img.height/2)+$(window).height()*(4/100)-5)+"px";
+
+  try {
+    if (typeof imgs[index + 1] == "undefined"){
+      document.getElementById('right_btn').style.visibility = "hidden";
+    } else {
+      document.getElementById('right_btn').style.visibility = "visible";
+    }
+  } catch { }
+
+  try {
+    if (typeof imgs[index - 1] == "undefined"){
+      document.getElementById('left_btn').style.visibility = "hidden";
+    } else {
+      document.getElementById('left_btn').style.visibility = "visible";
+    }
+  } catch { }
+  
+  if (ctn > 1){
+    document.getElementById('txt').innerHTML = ("("+String(index + 1)+"/"+String(ctn)+") "+ hedrtext);
+  } else {
+    document.getElementById('txt').innerHTML = hedrtext;
+  }
 }
 
+
 img.onload = CenterImage;
-window.onresize = CenterImage;
+window.onresize = OnResize;
+window.onload = OnLoad;
 CenterImage();
+
 img.style.position = "absolute"
 img.style.top = "50%";
 img.style.left = "50%";

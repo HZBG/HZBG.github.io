@@ -8,28 +8,18 @@
     <link rel="stylesheet" href="https://openlayers.org/en/latest/css/ol.css" type="text/css">
   </head>
   <body>
+    <h1 id="txt">Heading</h1>
+
     <div id="map" class="map" tabindex="0" oncontextmenu="return false;"></div>
 
-    <div id="imgbrowser">
-      <img id="black" src="assets/img/black.png">
-      <img id="img">
+    <img id="black" src="assets/img/black.png">
+    <img id="img">
 
-      <svg id="left_btn">
-        <path d="M15.41 16.09l-4.58-4.59 4.58-4.59L14 5.5l-6 6 6 6z"></path>
-      </svg>
+    <img id="right_btn" src="assets/img/right.png">
 
-      <svg id="right_btn">
-        <path d="M8.59 16.34l4.58-4.59-4.58-4.59L10 5.75l6 6-6 6z"></path>
-      </svg>
+    <img id="left_btn" src="assets/img/left.png">
 
-      <div style="position: absolute; top:10px; right: 10px;">
-        <svg id="close_btn">
-          <g transform="scale(5)">
-            <polygon points="10,1.01 8.99,0 5,3.99 1.01,0 0,1.01 3.99,5 0,8.99 1.01,10 5,6.01 8.99,10 10,8.99 6.01,5 "></polygon>
-          </g>
-        </svg>
-      </div>
-    </div>
+    <img id="close_btn" src="assets/img/close.png">
      
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="./bundle.js"></script>
